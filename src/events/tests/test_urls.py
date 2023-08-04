@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 from events.views import create_event, edit_event, change_num

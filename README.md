@@ -52,6 +52,6 @@ I decided to leave the .env file and don't put it the gitignore, in this way you
 The email to confirm right now will be sent to my email address, so if you want to test this, you will obviously have to change these credentials (But I know that you already know that better than me :smile: ).
 
 
-There are some bugs, like the one related to the change of the email that is not properly working and if you find more, please let me know. 
+There are some bugs, I recently solved the one related to the email (now it also changes the name of the event owner when he changes his email), but if you find any bugs, let me know!
 
 And that's it, hope you like it!

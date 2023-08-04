@@ -1,9 +1,11 @@
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.core import serializers
 from .forms import EventForm
 from .models import Event
-
+from datetime import datetime
+import json
 
 
 # Create your views here.
@@ -77,16 +79,34 @@ def change_num(request, event_id):
         If the user is in the participants, we will remove from them, reducing the number of participants
         else we will add to the participants and increase the number of participants
     """
+    
     event = get_object_or_404(Event, id=event_id)
 
-    if request.user in event.participants.all():
+    if request.user in event.participants.all() and len(event.participants.all()) > 0:
         event.num_of_participants -= 1
         event.participants.remove(request.user)
-        event.save()    
-        return JsonResponse({"success": True, 'num_of_participants': event.num_of_participants,  'is_in_participant': False})
+        event.save()
+        response = {
+            "response": {
+            "success": True,
+            "num_of_participants": event.num_of_participants,
+            "is_in_participant": False,
+            "event_id": event.id,
+            }
+        }
+
+        return JsonResponse(response, status=200)
     else:
         event.num_of_participants += 1
         event.participants.add(request.user)
         event.save()    
-        return JsonResponse({"success": True, 'num_of_participants': event.num_of_participants, 'is_in_participant': True})
+        response = {
+            "response": {
+            "success": True,
+            "num_of_participants": event.num_of_participants,
+            "is_in_participant": True,
+            "event_id": event.id,
+            }
+        }
 
+        return JsonResponse(response, status=200)

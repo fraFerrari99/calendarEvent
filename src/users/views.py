@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_list_or_404, render, redirect
 from django.contrib.auth import get_user_model, login, logout, get_user_model
 from django.contrib import messages #messages are used to display messages to the user
 from django.contrib.auth.decorators import login_required
@@ -12,7 +12,7 @@ from django.db.models.query_utils import Q
 from django.template.loader import render_to_string #used to render a template and return a string!
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_str
-
+from django.utils.text import slugify
 
 from .forms import UserRegistrationForm, UserUpdateForm, SetPasswordForm, ChangePasswordForm, ChangeEmailForm
 from .tokens import account_activation_token
@@ -44,7 +44,7 @@ def activate_email(request, user, to_email):
     domain = get_current_site(request).domain
     message = render_to_string("activate_account_template.html", {
         'user': user.email,
-        'domain': get_current_site(request).domain + ":8000",
+        'domain': domain + ":8000",
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': account_activation_token.make_token(user),
         'protocol': 'https' if request.is_secure() else 'http'
@@ -209,56 +209,54 @@ def password_reset_confirm(request, uidb64, token):
 
 @login_required
 def change_email(request):
-    """Change the email address"""
+
+    """
+    Change the email address of the user and also reflects on the events of that particular user!
+    """
+
     if request.method == 'POST':
         user = request.user
         form = ChangeEmailForm(request.POST)
         if form.is_valid():
             user_email = form.cleaned_data["email"] #get the new email
-            """
-            Check if new the user email already exists in the database
-            """
-            user_associated = get_user_model().objects.filter(Q(email=user_email)).first()
-            if user_associated:
-                """
-                User exists in the database, so print the error message and return to the homepage
-                """
-                messages.error(request, f'User {user_email} already exists, make sure it is <b>yours</b> and in case change your password!')
-                return redirect('/')
-            else:
-
-                #if user email does not exist in the database, change the email to the new one
-                update_event_owner_email(user, user_email)
-                user.email = user_email
-                user.save()
-                
-                messages.success(request, f"Email changed to {user_email} successfully!")
-                return redirect('/')
- 
+            #if user email does not exist in the database, change the email to the new one
+            update_event_owner_email(user, user_email)
+            messages.success(request, f"Email changed to {user_email} successfully!")
+            return redirect('/')
     
         """
-        If form is not valid, there can be a problem with the captcha!
+        If form is not valid, there can be a problem with the captcha or with the email that is already used!!
         """
         for key, error in list(form.errors.items()):
-            messages.error(request, error)
+            print("key: {}, error: {}".format(key, error))
             if key == 'captcha' and error[0] == 'This field is required.':
                 messages.error(request, "You must pass the reCAPTCHA test")
+            elif key =="email" and error[0] == 'User with this Email already exists.':
+                messages.error(request, f'User with this email already exists, make sure it is <b>yours</b> and in case change your password!')
                 continue
 
     form = ChangeEmailForm()
     return render(request, "change_email_confirm.html", {"form": form})
 
 def update_event_owner_email(user, new_email):
+
     """
         Get all events owned by the user and change the owner of each event if he changes his email address     
     """
-    user_events = Event.objects.filter(owner=user)
+
+    user_events = get_list_or_404(Event, owner=user)
+
+    user.email = new_email 
+    user.username = new_email.split("@")[0].capitalize()
+    #Save the user object 
+    user.save()
 
     # Update the email for each event
     for event in user_events:
-        event.owner_email = new_email
-        event.owner_username = new_email
+        event.owner = user
         event.save()
+
+
 
 
 
