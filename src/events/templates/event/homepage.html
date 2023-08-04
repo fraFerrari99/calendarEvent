@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Event Homepage</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}"> 
+  </head>
+  <body>
+    {% include 'event/navbar.html' %}
+    <!-- Used to show success message in case of a positive login or registration or logout! -->
+    {% include 'event/msg_success.html' %}
+    {% if events %} 
+      <section class="dark" >
+        <h1 class="h1 text-center" id="pageHeaderTitle">Event Calendar</h1>
+       {% for event in events %}
+        <!--Create a card for each of the event!-->
+          <div class="container py-4">
+            <article class="postcard dark blue">
+              {% if event.image %}
+              <!-- Show the image if it is present for the event! -->
+                <img class="postcard__img" src="{{ event.image.url }}" alt="Image Title" />
+              {% endif %}
+              <div class="postcard__text">
+                <h1 class="postcard__title blue"><a href="#">{{ event.title }}</a></h1>
+                <div class="postcard__subtitle small">
+                  <time datetime="2020-05-25 12:00:00">
+                    <!-- The date is formatted in this way, day Month YYYY, Day Of Week Hour:Minute -->
+                    <i class="fas fa-calendar-alt mr-2"></i>{{ event.date|date:"j F Y, l H:i" }} 
+                  </time>
+                </div>
+                <div class="postcard__bar"></div>
+                <div class="postcard__preview-txt"><i class="fa-solid fa-people-group"></i><b id="num_of_participants"> Participants: {{ event.num_of_participants }}</b></div>
+                <ul class="postcard__tagbox">
+                  <li class="tag__item tag" style="justify-content: center; align-items: center; display: flex;"><i class="fas fa-tag mr-2"></i>{{ event.split_username }}</li>
+                  {% if user.is_authenticated and user == event.owner %}
+                  <li class="tag__item edit blue">
+                    <!-- When the user clicks on edit_event it will also pass the id of the event! -->
+                    <a href="{% url 'edit_event' event.id %}"><i class="fas fa-edit mr-2"></i>Edit Event</a>
+                  </li>
+                  {% elif user.is_authenticated  %}
+                    <!-- Add the button that makes the user (not the owner of the event) opt out or participate to the event -->
+                    <form id="change_num" method="POST" enctype="multipart/form-data" action="{% url 'change_num' event.id %}">
+                      {% csrf_token %}
+                        {% if user in event.participants.all %}
+                        <button class="btn btn-outline-info" type="submit" id="btn_opt_participate">Opt out</button>
+                        {% else %}
+                        <button class="btn btn-outline-info" type="submit" id="btn_opt_participate">Participate</button>
+                        {% endif %}
+                    </form>
+                  {% endif %}
+                </ul>
+              </div>
+            </article>
+          </div>
+          {% endfor %}
+        </section>
+        {% else %}
+          <h1 class="h1 text-center" id="pageHeaderTitle" style="background-color: white; color: black;">Event Calendar</h1>
+        {% endif %}
+      <script>
+
+        
+        $(document).ready(function() {
+    
+            $('#change_num').submit(function(event) {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            // Update the displayed number of participants to the event
+                            $('#num_of_participants').text(' Participants: ' + response.num_of_participants);
+                            
+                            //Change the text of the button!
+                            if (response.is_in_participant){
+                              // The user is a participant, so change the text of the button to Opt out!
+                              $("#btn_opt_participate").text("Opt out");
+                            } else {
+                              // The user is not a participant, so change the text of the button to Participate!
+                              $("#btn_opt_participate").text("Participate");
+                            }
+
+                            
+                        
+                        } else {
+                            alert('Error incrementing the counter.');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Error occurred. Please try again.');
+                    }
+                });
+            });
+          });
+
+
+      
+    </script>
+  </body>
+</html>

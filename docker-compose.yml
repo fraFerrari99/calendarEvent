@@ -1,0 +1,49 @@
+version: '3.9'
+services:
+  django:
+    build : ./src
+    container_name: event_django
+    #I use this command for the development
+    # command:  >
+    #   sh -c "python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate && python manage.py test && python manage.py runserver 0.0.0.0:8000"
+    command:  >
+      sh -c "python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate && python manage.py test && hypercorn --bind '0.0.0.0:8000' src.asgi:application --reload"
+    volumes:
+      - ./src/static_cdn/static_root:/src/static_cdn/static_root
+      - ./src/media:/src/media
+    environment:
+      - DB_HOST=db
+      - DB_NAME=$POSTGRES_NAME
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: event_db
+    ports:
+      - "5433:5433"
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=$POSTGRES_NAME
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:rw
+
+  nginx:
+    image: nginx:alpine
+    container_name: event_nginx
+    ports:
+      - 8000:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./src/static_cdn/static_root:/static
+      - ./src/media/:/media
+    depends_on:
+      - django
+      
+volumes:
+  postgres_data:

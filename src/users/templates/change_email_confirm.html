@@ -1,0 +1,16 @@
+{% include "event/navbar.html" %}
+{% include "event/msg_alert.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+    <div class="content-section" style="margin-left: 1rem;">
+        <h2>Change Email Address</h2>
+        <p>Please enter your new email address.</p>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button class="btn btn-outline-info" type="submit">Change Email</button>
+        </form>
+    </div>
+{% endblock %}
