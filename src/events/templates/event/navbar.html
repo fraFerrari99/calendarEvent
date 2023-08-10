@@ -13,6 +13,38 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="https://kit.fontawesome.com/139c4cb125.js" crossorigin="anonymous"></script>
 </head>
+<style>
+  .custom-search {
+  position: relative;
+  width: 300px;
+}
+.custom-search-input {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 100px;
+  padding: 10px 100px 10px 20px; 
+  line-height: 1;
+  box-sizing: border-box;
+  outline: none;
+}
+.custom-search-botton {
+  position: absolute;
+  right: 3px; 
+  top: 3px;
+  bottom: 3px;
+  border: 0;
+  background-color: white;
+  outline: none;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: 100px;
+  z-index: 2;
+}
+
+.custom-search-botton:hover{
+  background-color: lightskyblue;
+}
+</style>
 <body>
   
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -22,6 +54,16 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <form class="d-flex" id="searchEventForm" role="search">
+              <div class="custom-search">
+                <input type="text" id="searchEventInput" class="custom-search-input" placeholder="Filter artists or events">
+                <button class="custom-search-botton" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>  
+              </div>
+            </form>
+          </li>
+        </ul>
         <ul class="navbar-nav ml-auto">
           {% if user.is_authenticated %}
           <li class="nav-item dropdown">

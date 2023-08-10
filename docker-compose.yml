@@ -4,10 +4,10 @@ services:
     build : ./src
     container_name: event_django
     #I use this command for the development
-    # command:  >
-    #   sh -c "python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate && python manage.py test && python manage.py runserver 0.0.0.0:8000"
     command:  >
-      sh -c "python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate && python manage.py test && hypercorn --bind '0.0.0.0:8000' src.asgi:application --reload"
+      sh -c "python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate && python manage.py test && python manage.py runserver 0.0.0.0:8000"
+    # command:  >
+    #   sh -c "python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate && python manage.py test && hypercorn --bind '0.0.0.0:8000' src.asgi:application --reload"
     volumes:
       - ./src/static_cdn/static_root:/src/static_cdn/static_root
       - ./src/media:/src/media

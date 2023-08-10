@@ -18,9 +18,10 @@
     <!-- Used to show success message in case of a positive login or registration or logout! -->
     {% include 'event/msg_success.html' %}
     {% if events %} 
-      <section class="dark" >
-        <h1 class="h1 text-center" id="pageHeaderTitle">Event Calendar</h1>
-       {% for event in events %}
+    <section class="dark" >
+      <h1 class="h1 text-center" id="pageHeaderTitle">Event Calendar</h1>
+      <!-- <div id="allCards">  -->
+      {% for event in events %}
         <!--Create a card for each of the event!-->
           <div class="container py-4">
             <article class="postcard dark blue">
@@ -30,6 +31,11 @@
               {% endif %}
               <div class="postcard__text">
                 <h1 class="postcard__title blue"><a href="#">{{ event.title }}</a></h1>
+                <!-- {% if event.artist %}
+                <div class="postcard__subtitle small">
+                    {{ event.artist }} 
+                </div> 
+                {% endif %} -->
                 <div class="postcard__subtitle small">
                   <time datetime="2020-05-25 12:00:00">
                     <!-- The date is formatted in this way, day Month YYYY, Day Of Week Hour:Minute -->
@@ -61,6 +67,8 @@
             </article>
           </div>
           {% endfor %}
+        <!-- </div>  -->
+          <!--  -->
         </section>
         {% else %}
           <h1 class="h1 text-center" id="pageHeaderTitle" style="background-color: white; color: black;">Event Calendar</h1>
@@ -104,7 +112,12 @@
                     }
                 });
             });
-          });
+
+          
+        });
+
+
+
 
 
       

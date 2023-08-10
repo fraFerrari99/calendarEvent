@@ -10,6 +10,7 @@ class Event(models.Model):
     num_of_participants = models.IntegerField(default=0)
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="owner_event")
     date = models.DateTimeField()
+    # artist = models.CharField(max_length=255, blank=True, null=True)
     
 
     #I added the image field so that the user can upload the image of the event

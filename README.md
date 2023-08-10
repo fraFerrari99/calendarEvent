@@ -47,11 +47,21 @@ This will run both the build and the up docker commands.
 
 # A Few Other Things 
 
-I decided to leave the .env file and don't put it the gitignore, in this way you can run and test the application with the postgres credentials.
+You need to put in the env files that are present in the project, the values that you have, so:
+* In the PostgreSQL credentials, put your credentials;
+* In SECRET_KEY, put your secret key you have when you create the Django project;
+* In DEBUG put False when you want to put in production or True when you are developing your application;
+* In DJANGO_ALLOWED_HOSTS, put the hosts you want to allow to use your application, for example: "localhost,127.0.0.1"
+* In RECAPTCHA_PUBLIC_KEY and RECAPTCHA_PRIVATE_KEY put the public and private keys you get when you create your captcha key at this site: https://www.google.com/recaptcha/admin/create
 
-The email to confirm right now will be sent to my email address, so if you want to test this, you will obviously have to change these credentials (But I know that you already know that better than me :smile: ).
+Also put the email host password and your email address in the .env file; to do that, you need to follow these steps:
 
+* Go to https://myaccount.google.com/
+* Click on security;
+* Search for app password on search filter bar;
+* Click on Other in Select app and give it a name;
+* Save the password;
+* Paste it into the EMAIL_HOST_PASSWORD field in env file and put in EMAIL_FROM the email address you want to use to send the emails;
 
-There are some bugs, I recently solved the one related to the email (now it also changes the name of the event owner when he changes his email), but if you find any bugs, let me know!
 
 And that's it, hope you like it!

@@ -17,6 +17,12 @@ def homepage(request):
     }
     return render(request, "event/homepage.html", context)
 
+# def search_events(request, search_text):
+#     if request.method == "GET":
+#         events_filtered = Event.objects.filter(title__icontains=search_text)
+#         return render(request, "event/homepage.html", {"events": events_filtered})
+
+
 
 def create_event(request):
     #!this function is used to give the user the option to create a new event

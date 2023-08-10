@@ -18,5 +18,5 @@ EXPOSE 8000
 #copy all the django project
 COPY . .
 
-#execute the commands inside the entrypoint.sh
+#execute the commands inside the entrypoint.sh if you want to run the commands that are run in the command yml file
 # ENTRYPOINT [ "sh", "./entrypoint.sh" ]
